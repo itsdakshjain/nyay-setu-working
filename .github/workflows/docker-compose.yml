@@ -1,0 +1,35 @@
+name: Docker Compose Validator
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'docker-compose.yml'
+      - '**/Dockerfile*'
+      
+  workflow_dispatch:
+
+jobs:
+  validate-docker:
+  
+    name: Validate Docker Config
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Verify Compose File Syntax
+        run: |
+          echo "Checking docker-compose.yml syntax structure..."
+          docker compose config --quiet
+          echo "✓ Docker compose syntax is perfectly valid."
+
+      - name: Dry Run Build Context Check
+        run: |
+          echo "Verifying local build paths and Dockerfiles..."
+          
+          # Validates that all build contexts and paths specified in the compose file actually exist
+          docker compose build --dry-run
+          echo "✓ All service build targets are accounted for."
